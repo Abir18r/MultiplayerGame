@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "UI/UI_HUD.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -29,6 +30,11 @@ APrototype_Character::APrototype_Character()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	
+	GetCharacterMovement()->bUseControllerDesiredRotation = true; // Rotate the character to the desired rotation
+	GetCharacterMovement()->bOrientRotationToMovement = true;  // Rotate character toward to the direction of acceleration
+	
+	bUseControllerRotationYaw = false;   // don't rotate the character by controller rotation
 
 }
 
@@ -37,6 +43,24 @@ void APrototype_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	// Sync the sprinting bool to everyone
 	DOREPLIFETIME(APrototype_Character, bIsSprinting);
+}
+
+void APrototype_Character::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (IsLocallyControlled())
+	{
+		// Load the Widget Class
+		if (HUDClass)
+		{
+			UUserWidget* HUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDClass);
+			if (HUDWidget)
+			{
+				HUDWidget->AddToViewport();
+			}
+		}
+	}
 }
 
 

@@ -23,6 +23,7 @@ public class MultiplayerGame : ModuleRules
 			{ 
 				"Core", 
 				"CoreUObject", 
+				"UMG",
 				"Engine", 
 				"InputCore", 
 				"EnhancedInput" 

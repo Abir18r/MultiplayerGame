@@ -30,7 +30,7 @@ void AItem_Cone::Interact_Implementation(AActor* InstigatorActor)
 			// DISABLE COLLISION
 			SetActorEnableCollision(false);
             
-			this->AttachToComponent(PlayerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head")
+			this->AttachToComponent(PlayerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("S_Hat")
 			);
 		}
 	}

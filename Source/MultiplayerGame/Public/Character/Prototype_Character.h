@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Prototype_Character.generated.h"
 
+class UUI_HUD;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -22,6 +23,7 @@ public:
 	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
 	
 private:
 
@@ -56,6 +58,9 @@ private:
 	/** Sprint/Run Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SprintAction;
+	
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UUI_HUD> HUDClass;
 
 protected:
 
