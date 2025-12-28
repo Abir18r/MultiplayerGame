@@ -20,6 +20,9 @@ class MULTIPLAYERGAME_API APrototype_Character : public ACharacter
 public:
 	APrototype_Character();
 	
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 private:
 
 	/** Camera boom positioning the camera behind the character */
@@ -49,6 +52,10 @@ private:
 	/** Interaction Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+	
+	/** Sprint/Run Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
 
 protected:
 
@@ -64,7 +71,26 @@ protected:
 	// SERVER RPC: The network command
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Interact();
-			
+	
+	// ** Sprint action ** //
+	
+	// Triggered when key is pressed/released
+	void StartSprint();
+	void StopSprint();
+
+	// Server RPC to change speed
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetSprinting(bool bNewSprinting);
+
+	// Variable to track state (Replicated so animations can use it later)
+	UPROPERTY(Replicated)
+	bool bIsSprinting;
+
+	// Speeds
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float RunSpeed;
 
 protected:
 	virtual void NotifyControllerChanged() override;

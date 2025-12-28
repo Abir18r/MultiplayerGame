@@ -7,11 +7,14 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Item/InteractableInterface.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 APrototype_Character::APrototype_Character()
+	: WalkSpeed(600.0f), RunSpeed(1000.0f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,6 +31,14 @@ APrototype_Character::APrototype_Character()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 }
+
+void APrototype_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	// Sync the sprinting bool to everyone
+	DOREPLIFETIME(APrototype_Character, bIsSprinting);
+}
+
 
 void APrototype_Character::Move(const FInputActionValue& Value)
 {
@@ -138,6 +149,10 @@ void APrototype_Character::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		
 		// Interaction
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &APrototype_Character::InteractTriggered);
+		
+		// Sprinting 
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APrototype_Character::StartSprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APrototype_Character::StopSprint);
 	}
 	else
 	{
@@ -145,3 +160,38 @@ void APrototype_Character::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
+void APrototype_Character::StartSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+    
+	// Execute on Server
+	Server_SetSprinting(true);
+}
+
+void APrototype_Character::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+    
+	// Execute on Server
+	Server_SetSprinting(false);
+}
+
+void APrototype_Character::Server_SetSprinting_Implementation(bool bNewSprinting)
+{
+	bIsSprinting = bNewSprinting;
+
+	// Apply speed on Server (Authoritative change)
+	if (bIsSprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
+}
+
+bool APrototype_Character::Server_SetSprinting_Validate(bool bNewSprinting)
+{
+	return true;
+}
