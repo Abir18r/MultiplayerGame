@@ -45,6 +45,10 @@ private:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+	
+	/** Interaction Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 
 protected:
 
@@ -53,6 +57,13 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+	
+	// Interact Function
+	void InteractTriggered(const FInputActionValue& Value);
+
+	// SERVER RPC: The network command
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Interact();
 			
 
 protected:

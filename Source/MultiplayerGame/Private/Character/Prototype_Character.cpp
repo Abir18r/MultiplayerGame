@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Item/InteractableInterface.h"
 
 // Sets default values
 APrototype_Character::APrototype_Character()
@@ -64,6 +65,47 @@ void APrototype_Character::Look(const FInputActionValue& Value)
 	}
 }
 
+void APrototype_Character::InteractTriggered(const FInputActionValue& Value)
+{
+	// Call the Server function immediately
+	Server_Interact();
+}
+
+bool APrototype_Character::Server_Interact_Validate()
+{
+	return true;
+}
+
+void APrototype_Character::Server_Interact_Implementation()
+{
+	// Define Trace Params
+	FVector Start = FollowCamera->GetComponentLocation();
+	FVector End = Start + (FollowCamera->GetForwardVector() * 1200.0f);
+    
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// Perform Line Trace
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	// Check if we hit an InteractableInterface
+	if (bHit && HitResult.GetActor())
+	{
+		// Draw line to the hit point
+		DrawDebugLine(GetWorld(), Start, HitResult.Location, FColor::Green, false, 3.0f, 0, 2.0f);
+        
+		// Draw a small sphere at the impact point to hit
+		DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Yellow, false, 3.0f);
+		
+		// Check if HitActor is Interactable
+		if (HitResult.GetActor()->Implements<UInteractableInterface>())
+		{
+			IInteractableInterface::Execute_Interact(HitResult.GetActor(), this);
+		}
+	}
+}
+
 void APrototype_Character::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
@@ -93,6 +135,9 @@ void APrototype_Character::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototype_Character::Look);
+		
+		// Interaction
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &APrototype_Character::InteractTriggered);
 	}
 	else
 	{
