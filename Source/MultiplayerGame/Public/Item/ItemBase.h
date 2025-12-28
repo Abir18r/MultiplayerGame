@@ -5,16 +5,19 @@
 #include "CoreMinimal.h"
 #include "InteractableInterface.h"
 #include "GameFramework/Actor.h"
-#include "Pickup_Item.generated.h"
+#include "ItemBase.generated.h"
 
 UCLASS()
-class MULTIPLAYERGAME_API APickup_Item : public AActor, public IInteractableInterface
+class MULTIPLAYERGAME_API AItemBase : public AActor, public IInteractableInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APickup_Item();
+	AItemBase();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item, meta = (ExposeOnSpawn = true))
+	UStaticMeshComponent* ObjectMesh;
 	
 	protected:
 	// Replication Properties

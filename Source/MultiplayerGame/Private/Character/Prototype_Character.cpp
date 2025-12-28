@@ -89,26 +89,35 @@ bool APrototype_Character::Server_Interact_Validate()
 
 void APrototype_Character::Server_Interact_Implementation()
 {
-	// Define Trace Params
+	// Define Trace Locations
 	FVector Start = FollowCamera->GetComponentLocation();
 	FVector End = Start + (FollowCamera->GetForwardVector() * 1200.0f);
     
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
+	
+	// Radius = Thickness of the trace
+	// HalfHeight = Length of the capsule shape itself
+	float TraceRadius = 30.0f;
+	float TraceHalfHeight = 30.0f; 
+	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(TraceRadius, TraceHalfHeight);
 
-	// Perform Line Trace
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+	// 2. PERFORM SWEEP (Capsule Trace)
+	// FQuat::Identity keeps the capsule upright (vertical) during the sweep.
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult, 
+		Start, 
+		End, 
+		FQuat::Identity, 
+		ECC_Visibility, 
+		CapsuleShape, 
+		Params
+	);
 
-	// Check if we hit an InteractableInterface
+	// Check results
 	if (bHit && HitResult.GetActor())
 	{
-		// Draw line to the hit point
-		DrawDebugLine(GetWorld(), Start, HitResult.Location, FColor::Green, false, 3.0f, 0, 2.0f);
-        
-		// Draw a small sphere at the impact point to hit
-		DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Yellow, false, 3.0f);
-		
 		// Check if HitActor is Interactable
 		if (HitResult.GetActor()->Implements<UInteractableInterface>())
 		{
