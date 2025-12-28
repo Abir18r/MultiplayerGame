@@ -21,4 +21,13 @@ protected:
 	
 	// Interface Implementation
 	virtual void Interact_Implementation(AActor* InstigatorActor) override;
+	
+	// Variable to track the state
+	UPROPERTY(ReplicatedUsing = OnRep_IsEquipped)
+	bool bIsEquipped;
+
+	// Function called on Clients when bIsEquipped changes
+	UFUNCTION()
+	void OnRep_IsEquipped();
+	
 };
