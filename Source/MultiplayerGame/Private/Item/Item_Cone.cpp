@@ -3,6 +3,7 @@
 
 #include "Item/Item_Cone.h"
 
+#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
@@ -23,6 +24,15 @@ void AItem_Cone::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 
 void AItem_Cone::Interact_Implementation(AActor* InstigatorActor)
 {
+	if (OverlapSphere)
+	{
+		// If the player actually overlapping the sphere then it can interact otherwise NOT
+		if (!OverlapSphere->IsOverlappingActor(InstigatorActor))
+		{
+			return; 
+		}
+	}
+	
 	if (HasAuthority())
 	{
 		ACharacter* PlayerCharacter = Cast<ACharacter>(InstigatorActor);

@@ -3,6 +3,7 @@
 
 #include "Item/Item_Sphere.h"
 
+#include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -41,6 +42,15 @@ void AItem_Sphere::OnRep_SphereColor()
 
 void AItem_Sphere::Interact_Implementation(AActor* InstigatorActor)
 {
+	if (OverlapSphere)
+	{
+		// If the player actually overlapping the sphere then it can interact otherwise NOT
+		if (!OverlapSphere->IsOverlappingActor(InstigatorActor))
+		{
+			return; 
+		}
+	}
+	
 	if (HasAuthority())
 	{
 		// Generate a random color

@@ -3,6 +3,8 @@
 
 #include "Item/Item_Cube.h"
 
+#include "Components/SphereComponent.h"
+
 
 // Sets default values
 AItem_Cube::AItem_Cube()
@@ -14,6 +16,15 @@ AItem_Cube::AItem_Cube()
 
 void AItem_Cube::Interact_Implementation(AActor* InstigatorActor)
 {
+	if (OverlapSphere)
+	{
+		// If the player actually overlapping the sphere then it can interact otherwise NOT
+		if (!OverlapSphere->IsOverlappingActor(InstigatorActor))
+		{
+			return; 
+		}
+	}
+	
 	if (HasAuthority())
 	{
 		Destroy();

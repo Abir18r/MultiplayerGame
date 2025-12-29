@@ -115,7 +115,7 @@ void APrototype_Character::Server_Interact_Implementation()
 {
 	// Define Trace Locations
 	FVector Start = FollowCamera->GetComponentLocation();
-	FVector End = Start + (FollowCamera->GetForwardVector() * 1200.0f);
+	FVector End = Start + (FollowCamera->GetForwardVector() * 500.0f);
     
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
@@ -127,7 +127,7 @@ void APrototype_Character::Server_Interact_Implementation()
 	float TraceHalfHeight = 30.0f; 
 	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(TraceRadius, TraceHalfHeight);
 
-	// 2. PERFORM SWEEP (Capsule Trace)
+	// I've Use Capsule Trace for better Trace instead of LineTraceSingle
 	// FQuat::Identity keeps the capsule upright (vertical) during the sweep.
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult, 
