@@ -4,6 +4,9 @@ Unreal Engine Game Developer – Technical Job Task
 
 # UE5 Multiplayer Interaction Prototype
 
+[Project Demo] (https://drive.google.com/file/d/1bo0pCbvM9U-XcrN5GKLJu9b13BDPqdO7/view?usp=sharing)
+[Video Demo](https://youtu.be/u4JsHG4A9EE)
+
 **A multiplayer prototype developed in Unreal Engine 5.5**
 
 This project demonstrates a networked gameplay, focusing on **replicated interaction systems**, **clean interface-driven architecture**, and **network bandwidth optimization**. The implementation prioritizes correctness, scalability, and real-world multiplayer constraints over feature count.
